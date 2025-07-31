@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav id="nav">
+        <ul class="logo">
+            <li>
+                <span>Logo</span>
+                <i class="fa fa-close" onclick="navTogglerClose();"></i>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <i class="fa fa-home"></i>
+                <a href="">Home</a>
+            </li>
+            <li>
+                <i class="fa fa-question-circle"></i>
+                <a href="">About</a>
+            </li>
+            <li>
+                <i class="fa fa-folder-open"></i>
+                <a href="">Browse</a>
+            </li>
+            <li>
+                <i class="fa fa-search"></i>
+                <a href="">Search</a>
+            </li>
+            <li>
+                <i class="fa fa-phone"></i>
+                <a href="">Contact</a>
+            </li>
+        </ul>
+    </nav>
+
+    <header>
+        <ul>
+            <li>Logo</li>
+        </ul>
+        <ul class="taps">
+            <li>
+                <i class="fa fa-home"></i>
+                <a href="">Home</a>
+            </li>
+            <li>
+                <i class="fa fa-question-circle"></i>
+                <a href="">About</a>
+            </li>
+            <li>
+                <i class="fa fa-folder-open"></i>
+                <a href="">Browse</a>
+            </li>
+            <li>
+                <i class="fa fa-search"></i>
+                <a href="">Search</a>
+            </li>
+            <li>
+                <i class="fa fa-phone"></i>
+                <a href="">Contact</a>
+            </li>
+        </ul>
+        <ul class="bars">
+            <li onclick="navTogglerOpen();">
+                <i class="fa fa-bars"></i>
+            </li>
+        </ul>
+    </header>
+
+
+    <script>
+        function navTogglerOpen(){
+            document.getElementById("nav").classList.add('showNav');
+        }
+        function navTogglerClose(){
+            document.getElementById("nav").classList.remove('showNav');
+        }
+    </script>
+</body>
+</html>
