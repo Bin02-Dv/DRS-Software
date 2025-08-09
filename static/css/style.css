@@ -87,6 +87,38 @@ nav ul li:hover{
     display: none;
 }
 
+/* about */
+
+.about {
+    padding: 40px 20px;
+    background-color: #f4f4f4;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: auto;
+    color: #222;
+}
+
+.about-content h1, .about-content h2 {
+    margin-bottom: 15px;
+    color: #000;
+}
+
+.about-content p {
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.about-content ul {
+    padding-left: 20px;
+}
+
+.about-content ul li {
+    margin-bottom: 10px;
+}
+
+
 
 
 

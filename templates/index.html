@@ -1,86 +1,63 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <nav id="nav">
-        <ul class="logo">
-            <li>
-                <span>Logo</span>
-                <i class="fa fa-close" onclick="navTogglerClose();"></i>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <i class="fa fa-home"></i>
-                <a href="">Home</a>
-            </li>
-            <li>
-                <i class="fa fa-question-circle"></i>
-                <a href="">About</a>
-            </li>
-            <li>
-                <i class="fa fa-folder-open"></i>
-                <a href="">Browse</a>
-            </li>
-            <li>
-                <i class="fa fa-search"></i>
-                <a href="">Search</a>
-            </li>
-            <li>
-                <i class="fa fa-phone"></i>
-                <a href="">Contact</a>
-            </li>
-        </ul>
-    </nav>
+{% extends "base.html" %}
 
-    <header>
-        <ul>
-            <li>Logo</li>
-        </ul>
-        <ul class="taps">
-            <li>
-                <i class="fa fa-home"></i>
-                <a href="">Home</a>
-            </li>
-            <li>
-                <i class="fa fa-question-circle"></i>
-                <a href="">About</a>
-            </li>
-            <li>
-                <i class="fa fa-folder-open"></i>
-                <a href="">Browse</a>
-            </li>
-            <li>
-                <i class="fa fa-search"></i>
-                <a href="">Search</a>
-            </li>
-            <li>
-                <i class="fa fa-phone"></i>
-                <a href="">Contact</a>
-            </li>
-        </ul>
-        <ul class="bars">
-            <li onclick="navTogglerOpen();">
-                <i class="fa fa-bars"></i>
-            </li>
-        </ul>
-    </header>
+{% block title %}
+<title>Fatwa Repository - Home</title>
+{% endblock %}
 
+{% block content %}
 
-    <script>
-        function navTogglerOpen(){
-            document.getElementById("nav").classList.add('showNav');
-        }
-        function navTogglerClose(){
-            document.getElementById("nav").classList.remove('showNav');
-        }
-    </script>
-</body>
-</html>
+<!-- Hero Section -->
+    <section class="flex flex-col items-center justify-center h-screen text-center px-4">
+      <h2 class="text-4xl md:text-6xl font-extrabold mb-4">Welcome to the Fatwa Repository</h2>
+      <p class="text-lg md:text-xl max-w-2xl mb-8 text-gray-700">
+        A comprehensive digital archive of Islamic rulings and guidance, curated under the expertise of Prof. Abdullahi.
+      </p>
+      <div class="relative w-full max-w-md">
+        <input type="text" placeholder="Search fatwas..." class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+        <button class="absolute right-2 top-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Search</button>
+      </div>
+    </section>
+
+    <!-- Featured Fatwas -->
+    <section class="py-16 px-4 md:px-16 bg-gray-100">
+      <h3 class="text-3xl font-bold mb-8 text-center">Featured Fatwas</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card p-6 bg-white rounded-lg glow">
+          <h4 class="text-xl font-semibold mb-2">Fatwa on Charity</h4>
+          <p class="text-gray-600">Guidance on the principles of Zakat and charitable giving in Islam.</p>
+        </div>
+        <div class="card p-6 bg-white rounded-lg glow">
+          <h4 class="text-xl font-semibold mb-2">Fatwa on Fasting</h4>
+          <p class="text-gray-600">Rulings on the obligations and exemptions during Ramadan.</p>
+        </div>
+        <div class="card p-6 bg-white rounded-lg glow">
+          <h4 class="text-xl font-semibold mb-2">Fatwa on Prayer</h4>
+          <p class="text-gray-600">Clarifications on the proper performance of Salah.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Uploads -->
+    <section class="py-16 px-4 md:px-16 bg-white">
+      <h3 class="text-3xl font-bold mb-8 text-center">Recent Uploads</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6 bg-white rounded-lg glow">
+          <h4 class="text-xl font-semibold mb-2">Fatwa on Marriage</h4>
+          <p class="text-gray-600">Recent rulings on marital obligations and rights.</p>
+          <p class="text-sm text-gray-500">Uploaded: Aug 5, 2025</p>
+        </div>
+        <div class="card p-6 bg-white rounded-lg glow">
+          <h4 class="text-xl font-semibold mb-2">Fatwa on Business Ethics</h4>
+          <p class="text-gray-600">Guidelines for ethical business practices in Islam.</p>
+          <p class="text-sm text-gray-500">Uploaded: Aug 3, 2025</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-6 px-4 md:px-16 text-center bg-white/80">
+      <p class="text-gray-700">&copy; 2025 Fatwa Repository. All rights reserved.</p>
+    </footer>
+  </div>
+
+{% endblock %}

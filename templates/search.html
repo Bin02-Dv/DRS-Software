@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Search Section -->
+    <section class="py-16 px-4 md:px-16 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold mb-8 text-center">Search Fatwas</h2>
+      <div class="bg-white p-8 rounded-lg glow mb-8">
+        <input type="text" placeholder="Enter keywords..." class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <select class="p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+            <option>Topic</option>
+            <option>Fiqh</option>
+            <option>Hadith</option>
+          </select>
+          <select class="p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+            <option>Year</option>
+            <option>2025</option>
+            <option>2024</option>
+          </select>
+          <select class="p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+            <option>Language</option>
+            <option>English</option>
+            <option>Arabic</option>
+          </select>
+        </div>
+        <button class="w-full p-4 mt-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Search</button>
+      </div>
+      <div class="space-y-4">
+        <div class="p-6 bg-white rounded-lg glow">
+          <h3 class="text-xl font-semibold">Fatwa on Charity</h3>
+          <p class="text-gray-600">Guidance on the principles of Zakat and charitable giving in Islam.</p>
+          <p class="text-sm text-gray-500">Category: Fiqh | Date: Aug 1, 2025</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg glow">
+          <h3 class="text-xl font-semibold">Fatwa on Fasting</h3>
+          <p class="text-gray-600">Rulings on the obligations and exemptions during Ramadan.</p>
+          <p class="text-sm text-gray-500">Category: Fiqh | Date: Jul 15, 2025</p>
+        </div>
+      </div>
+    </section>
+
+{% endblock %}

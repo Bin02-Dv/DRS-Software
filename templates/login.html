@@ -1,0 +1,20 @@
+{% extends 'dash/base.html' %}
+{% block title %}Login - Fatwa Repository{% endblock %}
+{% block content %}
+<section class="max-w-md mx-auto text-center">
+  <h2 class="text-3xl font-bold mb-8">Login</h2>
+  <form>
+    <div class="space-y-4 bg-white p-8 rounded-lg glow">
+    <input type="text" name="username" placeholder="Username" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+    <input type="password" name="password" placeholder="Password" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+    <button class="w-full p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Login</button>
+    <p class="text-sm text-gray-600">
+      <a href="" class="hover:text-blue-600">Forgot Password?</a>
+    </p>
+    <p class="text-sm text-gray-600">
+      Don't have an account? <a href="/signup/" class="hover:text-blue-600">Sign Up</a>
+    </p>
+  </div>
+  </form>
+</section>
+{% endblock %}
