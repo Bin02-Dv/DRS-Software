@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Fatwa Repository{% endblock %}</title>
+  <title>{% block title %}{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { margin: 0; overflow-x: hidden; background: #f5f5f5; }
     #canvas { position: fixed; top: 0; left: 0; z-index: -1; }
     .content { position: relative; z-index: 10; }
     .glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+    .card { transition: transform 0.3s; }
+    .card:hover { transform: translateY(-10px) scale(1.05); }
   </style>
 </head>
 <body class="text-gray-900 font-sans">
@@ -24,21 +26,12 @@
         <a href="/" class="mx-4 hover:text-blue-600">Home</a>
         <a href="/about/" class="mx-4 hover:text-blue-600">About</a>
         <a href="/contact/" class="mx-4 hover:text-blue-600">Contact</a>
-        {% if user.is_authenticated %}
-          <a href="/dash/" class="mx-4 hover:text-blue-600">Dashboard</a>
-          <a href="/logout/" class="mx-4 hover:text-blue-600">Logout</a>
-        {% else %}
-          <a href="/login/" class="mx-4 hover:text-blue-600">Login</a>
-          <a href="/signup/" class="mx-4 hover:text-blue-600">Sign Up</a>
-        {% endif %}
+        <a href="/dash/" class="mx-4 text-blue-600">Dashboard</a>
+        <a href="/logout/" class="mx-4 hover:text-blue-600">Logout</a>
       </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="py-16 px-4 md:px-16">
-      {% block content %}
-      {% endblock %}
-    </main>
+    {% block content %}{% endblock %}
 
     <!-- Footer -->
     <footer class="py-6 px-4 md:px-16 text-center bg-white/80">
@@ -83,6 +76,22 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Chart.js for Activity Chart
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Uploads',
+          data: [10, 20, 15, 30, 25, 40],
+          borderColor: '#2563eb',
+          fill: false
+        }]
+      },
+      options: { responsive: true }
     });
   </script>
 </body>

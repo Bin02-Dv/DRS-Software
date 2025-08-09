@@ -1,16 +1,28 @@
 {% extends 'dash/base.html' %}
+{% load static %}   
 {% block title %}Sign Up - Fatwa Repository{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/popup.css' %}">
 <section class="max-w-md mx-auto text-center">
   <h2 class="text-3xl font-bold mb-8">Sign Up</h2>
-  <form>
+  <div id="popupModal" class="modal flex">
+    <div id="modalContent" class="modal-content glow">
+      <span class="modal-close" onclick="hidePopup()">&times;</span>
+      <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
+      <p id="popupMessage" class="text-gray-600 mb-6">Your account has been created successfully. Welcome to the Fatwa Repository!</p>
+      <a id="popupAction" href="/dashboard.html" class="p-3 text-white rounded-lg glow">Go to Dashboard</a>
+    </div>
+  </div>
+  <form id="signup">
+    {% csrf_token %}
     <div class="space-y-4 bg-white p-8 rounded-lg glow">
-    <input type="text" name="full_name" placeholder="Full Name" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
-    <input type="text" name="username" placeholder="Username" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
-    <input type="email" name="email" placeholder="Email" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+    <input type="text" name="full_name" placeholder="Full Name" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+    <input type="text" name="username" placeholder="Username" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+    <input type="email" name="email" placeholder="Email" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+    <input type="text" name="phone_number" placeholder="Phone Number" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
     <input type="text" name="institution" placeholder="Institution (Optional)" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
-    <input type="password" name="password" placeholder="Password" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
-    <input type="password" name="confirm_password" placeholder="Confirm Password" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+    <input type="password" name="password" placeholder="Password" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+    <input type="password" name="confirm_password" placeholder="Confirm Password" class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
     <button class="w-full p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Sign Up</button>
     <p class="text-sm text-gray-600">
       Already have an account? <a href="/login/" class="hover:text-blue-600">Login</a>
@@ -18,4 +30,60 @@
   </div>
   </form>
 </section>
+
+<script>
+  function showPopup(type, title, message, actionUrl, actionText) {
+      const modalContent = document.getElementById('modalContent');
+      const actionButton = document.getElementById('popupAction');
+      document.getElementById('popupTitle').textContent = title;
+      document.getElementById('popupMessage').textContent = message;
+      actionButton.href = actionUrl;
+      actionButton.textContent = actionText;
+      
+      // Update styling based on type
+      modalContent.classList.remove('modal-success', 'modal-error');
+      actionButton.classList.remove('btn-success', 'btn-error');
+      if (type === 'success') {
+        modalContent.classList.add('modal-success');
+        actionButton.classList.add('btn-success');
+      } else if (type === 'error') {
+        modalContent.classList.add('modal-error');
+        actionButton.classList.add('btn-error');
+      }
+      
+      document.getElementById('popupModal').style.display = 'flex';
+    }
+
+    function hidePopup() {
+      document.getElementById('popupModal').style.display = 'none';
+    }
+
+    document.getElementById('popupModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('popupModal')) {
+        hidePopup();
+      }
+    });
+</script>
+
+<script>
+    $(document).on('submit', '#signup', function (e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: 'POST',
+            url: '/signup/', 
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response){
+                var success = response['success'];
+                if(success){
+                    showPopup('success', 'Success!', response['message'], '/login/', 'Now you can Login.')
+                }else{
+                    showPopup('error', 'Error!', response['message'], '#', 'Again!')
+                }
+            }
+        });
+    });
+  </script>
 {% endblock %}

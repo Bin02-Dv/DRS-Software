@@ -1,0 +1,142 @@
+<script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <style>
+    body { margin: 0; overflow-x: hidden; background: #f5f5f5; }
+    #canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+    .content { position: relative; z-index: 10; }
+    .glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+    .modal {
+      display: none;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); z-index: 1000;
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background: white; padding: 2rem; border-radius: 1rem;
+      max-width: 24rem; width: 90%; text-align: center;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .modal-success { border: 2px solid #10b981; }
+    .modal-error { border: 2px solid #ef4444; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .modal-close {
+      position: absolute; top: 0.5rem; right: 0.5rem;
+      cursor: pointer; font-size: 1.5rem; color: #4b5563;
+    }
+    .modal-close:hover { color: #2563eb; }
+    .btn-success { background-color: #10b981; }
+    .btn-success:hover { background-color: #059669; }
+    .btn-error { background-color: #ef4444; }
+    .btn-error:hover { background-color: #dc2626; }
+  </style>
+<body class="text-gray-900 font-sans">
+  <canvas id="canvas"></canvas>
+  <div class="content min-h-screen">
+
+    <!-- Demo Section -->
+    <section class="py-16 px-4 md:px-16 text-center">
+      <h2 class="text-3xl font-bold mb-8">Message Popup Demo</h2>
+      <div class="flex justify-center space-x-4">
+        <button onclick="showPopup('success', 'Success!', 'Your account has been created successfully. Welcome to the Fatwa Repository!', '/dashboard.html', 'Go to Dashboard')" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">
+          Show Success Popup
+        </button>
+        <button onclick="showPopup('error', 'Error!', 'Username already exists. Please choose a different username.', '/register.html', 'Try Again')" class="p-4 bg-red-600 text-white rounded-lg hover:bg-red-700 glow">
+          Show Error Popup
+        </button>
+      </div>
+    </section>
+
+    <!-- Popup Modal -->
+    <div id="popupModal" class="modal flex">
+      <div id="modalContent" class="modal-content glow">
+        <span class="modal-close" onclick="hidePopup()">&times;</span>
+        <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
+        <p id="popupMessage" class="text-gray-600 mb-6">Your account has been created successfully. Welcome to the Fatwa Repository!</p>
+        <a id="popupAction" href="/dashboard.html" class="p-3 text-white rounded-lg glow">Go to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-6 px-4 md:px-16 text-center bg-white/80">
+      <p class="text-gray-700">&copy; 2025 Fatwa Repository. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Three.js Background Animation
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const colors = [];
+    for (let i = 0; i < 1000; i++) {
+      vertices.push(
+        (Math.random() - 0.5) * 200,
+        (Math.random() - 0.5) * 200,
+        (Math.random() - 0.5) * 200
+      );
+      colors.push(0.4, 0.6, 1);
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    const material = new THREE.PointsMaterial({ size: 0.5, vertexColors: true });
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    camera.position.z = 50;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      particles.rotation.y += 0.001;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Popup Functions
+    function showPopup(type, title, message, actionUrl, actionText) {
+      const modalContent = document.getElementById('modalContent');
+      const actionButton = document.getElementById('popupAction');
+      document.getElementById('popupTitle').textContent = title;
+      document.getElementById('popupMessage').textContent = message;
+      actionButton.href = actionUrl;
+      actionButton.textContent = actionText;
+      
+      // Update styling based on type
+      modalContent.classList.remove('modal-success', 'modal-error');
+      actionButton.classList.remove('btn-success', 'btn-error');
+      if (type === 'success') {
+        modalContent.classList.add('modal-success');
+        actionButton.classList.add('btn-success');
+      } else if (type === 'error') {
+        modalContent.classList.add('modal-error');
+        actionButton.classList.add('btn-error');
+      }
+      
+      document.getElementById('popupModal').style.display = 'flex';
+    }
+
+    function hidePopup() {
+      document.getElementById('popupModal').style.display = 'none';
+    }
+
+    // Close popup when clicking outside
+    document.getElementById('popupModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('popupModal')) {
+        hidePopup();
+      }
+    });
+  </script>
+</body>
+</html>
