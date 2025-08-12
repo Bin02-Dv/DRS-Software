@@ -13,4 +13,5 @@ urlpatterns = [
     # dashboard
     path('dash/', views.dash, name='dash'),
     path('manage-users/', views.manage_users, name='manage-users'),
+    path('user-details/<int:id>/', views.user_details, name='user-details'),
 ]

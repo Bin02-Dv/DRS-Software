@@ -91,3 +91,18 @@ def manage_users(request):
         "users": all_users
     }
     return render(request, 'dash/manage-users.html', context)
+
+@login_required(login_url='/login/')
+def user_details(request, id):
+    try:
+        user = models.AuthModel.objects.get(id=id)
+    except:
+        return JsonResponse({
+            "message": f"Sorry we couldn't find a User with this ID - {id}",
+            "success": False
+        })
+    
+    context = {
+        "user": user
+    }
+    return render(request, 'dash/userdetails.html', context)

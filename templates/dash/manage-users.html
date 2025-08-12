@@ -33,12 +33,12 @@
             {% if users %}
             {% for user in users %}
             <tr>
-              <td>{{user.id}}</td>
+              <td>UID-{{user.id}}</td>
               <td>{{user.full_name}}</td>
               <td>{{user.email}}</td>
               <td>{{user.role}}</td>
               <td>
-                <button onclick="showPopup('success', 'Success!', 'User scholar1 has been edited.', '/manage_users.html', 'OK')" class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">View</button>
+                <a href="/user-details/{{user.id}}/" class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">View</a>
                 <button onclick="showPopup('error', 'Error!', 'Cannot delete user scholar1 due to active documents.', '/manage_users.html', 'OK')" class="p-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
               </td>
             </tr>

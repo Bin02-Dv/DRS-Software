@@ -1,0 +1,75 @@
+{% extends "dash/dash-base.html" %}
+
+{% block title %}Users - {{user.full_name}}{% endblock %}
+
+
+{% block content %}
+
+<style>
+    .detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; }
+    .detail-label { font-weight: bold; color: #4b5563; }
+    .detail-value { color: #1f2937; }
+</style>
+
+<!-- View User Details Section -->
+    <section class="py-16 px-4 md:px-16 max-w-lg mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8">User Details</h2>
+      <div class="bg-white p-6 rounded-lg glow">
+        <h3 class="text-xl font-semibold mb-4">{{user.full_name}}</h3>
+        <div class="space-y-2 text-left">
+          <div class="detail-row">
+            <span class="detail-label">Username:</span>
+            <span class="detail-value">{{user.username}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{user.email}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Role:</span>
+            <span class="detail-value">{{user.role}}</span>
+          </div>
+          {% comment %} <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value">Approved</span>
+          </div> {% endcomment %}
+          <div class="detail-row">
+            <span class="detail-label">Institution:</span>
+            {% if user.institution %}
+            <span class="detail-value">{{user.institution}}</span>
+            {% else %}
+            <span class="detail-value">No Institution yet!</span>
+            {% endif %}
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phone Number:</span>
+            <span class="detail-value">{{user.phone_number}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Join Date:</span>
+            <span class="detail-value">{{user.date_joined}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Last Login:</span>
+            <span class="detail-value">{{user.last_login}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Document Count:</span>
+            <span class="detail-value">5</span>
+          </div>
+        </div>
+        {% comment %} <div class="mt-6 flex justify-center space-x-4">
+          <button onclick="showPopup('success', 'Success!', 'User details updated successfully.', '/view_user_details.html', 'OK')" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">
+            Save Changes
+          </button>
+          <button onclick="showPopup('error', 'Error!', 'Failed to update user details. Please try again.', '/view_user_details.html', 'Try Again')" class="p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 glow">
+            Simulate Error
+          </button>
+        </div> {% endcomment %}
+        <p class="mt-4 text-sm text-gray-600">
+          <a href="/manage-users/" class="hover:text-blue-600">Back to Manage Users</a>
+        </p>
+      </div>
+    </section>
+
+{% endblock %}
