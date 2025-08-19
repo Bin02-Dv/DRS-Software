@@ -1,0 +1,151 @@
+{% extends "dash/dash-base.html" %}
+
+{% load static %}
+{% block title %}Fatwa Repository - Manage Documents{% endblock %}
+
+{% block content %}
+<style>
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+  th { background: #f9fafb; font-weight: bold; }
+  tr:hover { background: #f1f5f9; }
+  .bg-white { height: 50vh; overflow-y: scroll; }
+</style>
+
+<link rel="stylesheet" href="{% static 'css/popup.css' %}">
+
+<section class="py-16 px-4 md:px-16 max-w-5xl mx-auto">
+  <h2 class="text-3xl font-bold mb-8 text-center">Manage Documents</h2>
+
+  <div class="bg-white p-6 rounded-lg glow mb-8">
+    <h3 class="text-xl font-semibold mb-4">Upload Document</h3>
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label for="title" class="block text-gray-600 mb-2">Document Title</label>
+        <input type="text" name="title" id="title" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="description" class="block text-gray-600 mb-2">Document Description</label>
+        <textarea name="description" id="description" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow"></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label for="file" class="block text-gray-600 mb-2">Upload File (PDF or Audio)</label>
+        <input type="file" name="file" id="file" accept=".pdf,.mp3,.wav" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+      </div>
+      
+      <button type="submit" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Upload</button>
+    </form>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg glow">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Uploaded By</th>
+          <th>Upload Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if uploads %}
+        {% for document in uploads %}
+        <tr>
+          <td>DOC-{{ document.id }}</td>
+          <td>{{ document.title }}</td>
+          <td>{{ document.user.full_name }}</td>
+          <td>{{ document.upload_date|date:"Y-m-d" }}</td>
+          <td>{{ document.status|capfirst }}</td>
+          <td>
+            <a href="/view-documents/{{document.id}}" class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">View</a>
+            <button onclick="showPopup('success', 'Success!', 'Document {{ document.title }} updated successfully.', '/', 'OK')" class="p-2 bg-green-600 text-white rounded hover:bg-green-700">Edit</button>
+            <button onclick="showPopup('error', 'Error!', 'Cannot delete document {{ document.title }} due to pending status.', '/', 'OK')" class="p-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center">No Documents yet!</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Popup Modal -->
+<div id="popupModal" class="modal flex">
+  <div id="modalContent" class="modal-content glow">
+    <span class="modal-close" onclick="hidePopup()">&times;</span>
+    <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
+    <p id="popupMessage" class="text-gray-600 mb-6">Your action was successful.</p>
+    <a id="popupAction" href="/manage-documents/" class="p-3 text-white rounded-lg glow">OK</a>
+  </div>
+</div>
+
+<script>
+  // Popup Functions
+  function showPopup(type, title, message, actionUrl, actionText) {
+    const modalContent = document.getElementById('modalContent');
+    const actionButton = document.getElementById('popupAction');
+    document.getElementById('popupTitle').textContent = title;
+    document.getElementById('popupMessage').textContent = message;
+    actionButton.href = actionUrl;
+    actionButton.textContent = actionText;
+    modalContent.classList.remove('modal-success', 'modal-error');
+    actionButton.classList.remove('btn-success', 'btn-error');
+    if (type === 'success') {
+      modalContent.classList.add('modal-success');
+      actionButton.classList.add('btn-success');
+    } else if (type === 'error') {
+      modalContent.classList.add('modal-error');
+      actionButton.classList.add('btn-error');
+    }
+    document.getElementById('popupModal').style.display = 'flex';
+  }
+
+  function hidePopup() {
+    document.getElementById('popupModal').style.display = 'none';
+  }
+
+  document.getElementById('popupModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('popupModal')) {
+      hidePopup();
+    }
+  });
+
+</script>
+
+<script>
+    $(document).on('submit', '#uploadForm', function (e){
+        e.preventDefault();
+        const fileInput = document.getElementById('file');
+        const file = fileInput.files[0];
+        if (file && (file.type === 'application/pdf' || file.type === 'audio/mpeg' || file.type === 'audio/wav')) {
+            var formData = new FormData(this);
+            $.ajax({
+                type: 'POST',
+                url: '/manage-documents/', 
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response){
+                    var success = response['success'];
+                    if(success){
+                        showPopup('success', 'Success!', response['message'], '/manage-documents/', 'OK');
+                    }else{
+                        showPopup('error', 'Error!', response['message'], '#', 'Try Again!')
+                    }
+                }
+            });
+        } else {
+            showPopup('error', 'Error!', 'Invalid file format. Please upload a PDF or audio file (MP3, WAV).', '/manage-documents/', 'Try Again');
+        }
+    });
+  </script>
+{% endblock %}

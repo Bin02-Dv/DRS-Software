@@ -1,19 +1,22 @@
 {% extends "dash/dash-base.html" %}
 
+{% load static %}
 {% block title %}Fatwa Repository - Users{% endblock %}
 
 {% block content %}
 
+
 <style>
-
-    table { width: 100%; border-collapse: collapse;}
-    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
-    th { background: #f9fafb; font-weight: bold; }
-    tr:hover { background: #f1f5f9; }
-
-    .bg-white{height: 50vh; overflow-y: scroll;}
-
+  
+  table { width: 100%; border-collapse: collapse;}
+  th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+  th { background: #f9fafb; font-weight: bold; }
+  tr:hover { background: #f1f5f9; }
+  
+  .bg-white{height: 50vh; overflow-y: scroll;}
+  
 </style>
+<link rel="stylesheet" href="{% static 'css/popup.css' %}">
 
 <!-- Manage Users Section -->
     <section class="py-16 px-4 md:px-16 max-w-5xl mx-auto">
@@ -39,7 +42,7 @@
               <td>{{user.role}}</td>
               <td>
                 <a href="/user-details/{{user.id}}/" class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">View</a>
-                <button onclick="showPopup('error', 'Error!', 'Cannot delete user scholar1 due to active documents.', '/manage_users.html', 'OK')" class="p-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+                <button onclick="showPopup('error', 'Error!', 'Cannot delete user {{user.full_name}} due to active documents.', '/manage-users/', 'OK')" class="p-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
               </td>
             </tr>
             {% endfor %}
@@ -54,4 +57,44 @@
     </section>
 
 
+    <div id="popupModal" class="modal flex">
+      <div id="modalContent" class="modal-content glow">
+        <span class="modal-close" onclick="hidePopup()">&times;</span>
+        <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
+        <p id="popupMessage" class="text-gray-600 mb-6">Your action was successful.</p>
+        <a id="popupAction" href="/manage-users/" class="p-3 text-white rounded-lg glow">OK</a>
+      </div>
+    </div>
+
+
+    <script>
+      function showPopup(type, title, message, actionUrl, actionText) {
+        const modalContent = document.getElementById('modalContent');
+        const actionButton = document.getElementById('popupAction');
+        document.getElementById('popupTitle').textContent = title;
+        document.getElementById('popupMessage').textContent = message;
+        actionButton.href = actionUrl;
+        actionButton.textContent = actionText;
+        modalContent.classList.remove('modal-success', 'modal-error');
+        actionButton.classList.remove('btn-success', 'btn-error');
+        if (type === 'success') {
+          modalContent.classList.add('modal-success');
+          actionButton.classList.add('btn-success');
+        } else if (type === 'error') {
+          modalContent.classList.add('modal-error');
+          actionButton.classList.add('btn-error');
+        }
+        document.getElementById('popupModal').style.display = 'flex';
+      }
+
+      function hidePopup() {
+        document.getElementById('popupModal').style.display = 'none';
+      }
+
+      document.getElementById('popupModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('popupModal')) {
+          hidePopup();
+        }
+      });
+    </script>
 {% endblock %}

@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from . import models
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 
@@ -106,3 +108,67 @@ def user_details(request, id):
         "user": user
     }
     return render(request, 'dash/userdetails.html', context)
+
+@login_required(login_url='/login/')
+def manage_documents(request):
+    current_user = models.AuthModel.objects.filter(username=request.user).first()
+    all_uploads = models.Upload.objects.all().order_by("-id")
+    if request.method == 'POST':
+        title = request.POST.get("title", "")
+        description = request.POST.get("description", "")
+        file = request.FILES.get("file", "")
+        
+        max_size = 10 * 1024 * 1024  # 10MB
+        
+        if current_user:
+            if file and file.name.lower().endswith(('.pdf', '.mp3', '.wav')) and file.size <= max_size:
+                file_type = 'audio' if file.name.lower().endswith(('.mp3', '.wav')) else 'pdf'
+                models.Upload.objects.create(
+                    user=current_user, title=title, description=description, file=file, file_type=file_type
+                )
+                
+                return JsonResponse({
+                    "message": "Document uploaded successfully...",
+                    "success": True
+                })
+            else:
+                return JsonResponse({
+                    "message":"Sorry your file size must be below 10MB!!",
+                    "success": False
+                })
+        
+        else:
+            return JsonResponse({
+                "message": "Sorry we couldn't detect any Active user!!",
+                "success": False
+            })
+
+    context = {
+        "uploads": all_uploads
+    }
+        
+        
+    return render(request, "dash/manage-docs.html", context)
+
+@login_required(login_url='/login/')
+def view_document(request, id):
+    document = models.Upload.objects.filter(id=id).first()
+    context = {
+        "document": document
+    }
+    return render(request, "dash/view-documents.html", context)
+
+@login_required(login_url='/login/')
+@require_POST
+def update_upload_status(request, id):
+    doc = get_object_or_404(models.Upload, id=id)
+    
+    doc.status = "approved"
+    doc.save()
+
+    return JsonResponse({
+        "message": f"Document {doc.title} approved successfully",
+        "success": True,
+        "id": doc.id,
+        "status": doc.status,
+    })
