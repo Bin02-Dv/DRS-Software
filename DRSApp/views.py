@@ -84,7 +84,22 @@ def search(request):
 
 @login_required(login_url='/login/')
 def dash(request):
-    return render(request, 'dash/dashboard.html')
+    current_user = request.user
+    total_docs_uploaded = models.Upload.objects.all().count()
+    formatted_total_uploaded_docs = f"{total_docs_uploaded:,}"
+    
+    total_users = models.AuthModel.objects.all().count()
+    formatted_total_users = f"{total_users:,}"
+    
+    total_pending_approvals = models.Upload.objects.filter(status='pending').count()
+    formatted_total_pending_approvals = f"{total_pending_approvals}"
+    context = {
+        "total_docs_uploaded": formatted_total_uploaded_docs,
+        "total_users": formatted_total_users,
+        "total_pending_approvals": formatted_total_pending_approvals,
+        "current_user": current_user
+    }
+    return render(request, 'dash/dashboard.html', context)
 
 @login_required(login_url='/login')
 def manage_users(request):
