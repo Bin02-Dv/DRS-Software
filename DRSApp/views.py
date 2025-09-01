@@ -5,6 +5,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
+from django.db.models import Q
 
 # Create your views here.
 
@@ -12,7 +13,11 @@ def popup(request):
     return render(request, 'popup.html')
 
 def index(request):
-    return render(request, "index.html")
+    all_uploads = models.Upload.objects.filter(status='approved').order_by("-id")
+    context = {
+        'uploads': all_uploads
+    }
+    return render(request, "index.html", context)
 
 def logout(request):
     auth.logout(request)
@@ -80,7 +85,11 @@ def about(request):
     return render(request, 'about.html')
 
 def search(request):
-    return render(request, 'search.html')
+    all_uploads = models.Upload.objects.filter(status='approved').order_by("-id")
+    context = {
+        "uploads": all_uploads
+    }
+    return render(request, 'search.html', context)
 
 @login_required(login_url='/login/')
 def dash(request):
@@ -128,8 +137,10 @@ def user_details(request, id):
 def manage_documents(request):
     current_user = models.AuthModel.objects.filter(username=request.user).first()
     all_uploads = models.Upload.objects.all().order_by("-id")
+    current_user_uploads = models.Upload.objects.filter(user=current_user).order_by("-id")
     if request.method == 'POST':
         title = request.POST.get("title", "")
+        topic = request.POST.get("topic", "")
         description = request.POST.get("description", "")
         file = request.FILES.get("file", "")
         
@@ -139,7 +150,7 @@ def manage_documents(request):
             if file and file.name.lower().endswith(('.pdf', '.mp3', '.wav')) and file.size <= max_size:
                 file_type = 'audio' if file.name.lower().endswith(('.mp3', '.wav')) else 'pdf'
                 models.Upload.objects.create(
-                    user=current_user, title=title, description=description, file=file, file_type=file_type
+                    user=current_user, title=title, topic=topic, description=description, file=file, file_type=file_type
                 )
                 
                 return JsonResponse({
@@ -159,7 +170,9 @@ def manage_documents(request):
             })
 
     context = {
-        "uploads": all_uploads
+        "uploads": all_uploads,
+        "current_user": current_user,
+        "current_user_uploads": current_user_uploads
     }
         
         
@@ -168,10 +181,19 @@ def manage_documents(request):
 @login_required(login_url='/login/')
 def view_document(request, id):
     document = models.Upload.objects.filter(id=id).first()
+    current_user = models.AuthModel.objects.filter(username=request.user).first()
+    context = {
+        "document": document,
+        "current_user": current_user
+    }
+    return render(request, "dash/view-documents.html", context)
+
+def public_view_document(request, id):
+    document = models.Upload.objects.filter(id=id).first()
     context = {
         "document": document
     }
-    return render(request, "dash/view-documents.html", context)
+    return render(request, "docs-public-view.html", context)
 
 @login_required(login_url='/login/')
 @require_POST
@@ -187,3 +209,34 @@ def update_upload_status(request, id):
         "id": doc.id,
         "status": doc.status,
     })
+
+def search_documents(request):
+    keyword = request.GET.get("keyword", "")
+    topic = request.GET.get("topic", "")
+    year = request.GET.get("year", "")
+
+    # Start filtering
+    results = models.Upload.objects.filter(status="approved")  # show only approved docs
+
+    if keyword:
+        results = results.filter(
+            Q(title__icontains=keyword) | Q(description__icontains=keyword)
+        )
+    if topic and topic != "Topic":
+        results = results.filter(topic__iexact=topic)
+    if year and year != "Year":
+        results = results.filter(upload_date__year=year)
+
+    # Build JSON response
+    data = []
+    for doc in results:
+        data.append({
+            "id": doc.id,
+            "title": doc.title,
+            "description": doc.description,
+            "file_url": doc.file.url,
+            "upload_date": doc.upload_date.strftime("%Y-%m-%d"),
+            "topic": doc.topic,
+        })
+
+    return JsonResponse({"results": data})

@@ -16,5 +16,8 @@ urlpatterns = [
     path('user-details/<int:id>/', views.user_details, name='user-details'),
     path('manage-documents/', views.manage_documents, name='mange-documents'),
     path('view-documents/<int:id>', views.view_document, name="view-documents"),
-    path('update-document-status/<int:id>', views.update_upload_status, name="update-document-status")
+    path('public-view-documents/<int:id>', views.public_view_document, name="public-view-documents"),
+    path('update-document-status/<int:id>', views.update_upload_status, name="update-document-status"),
+    
+    path("search-documents/", views.search_documents, name="search_documents"),
 ]

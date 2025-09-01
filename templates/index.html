@@ -19,23 +19,21 @@
     </section>
 
     <!-- Featured Fatwas -->
+    {% if uploads %}
     <section class="py-16 px-4 md:px-16 bg-gray-100">
       <h3 class="text-3xl font-bold mb-8 text-center">Featured Fatwas</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card p-6 bg-white rounded-lg glow">
-          <h4 class="text-xl font-semibold mb-2">Fatwa on Charity</h4>
-          <p class="text-gray-600">Guidance on the principles of Zakat and charitable giving in Islam.</p>
-        </div>
-        <div class="card p-6 bg-white rounded-lg glow">
-          <h4 class="text-xl font-semibold mb-2">Fatwa on Fasting</h4>
-          <p class="text-gray-600">Rulings on the obligations and exemptions during Ramadan.</p>
-        </div>
-        <div class="card p-6 bg-white rounded-lg glow">
-          <h4 class="text-xl font-semibold mb-2">Fatwa on Prayer</h4>
-          <p class="text-gray-600">Clarifications on the proper performance of Salah.</p>
-        </div>
+        {% for upload in uploads %}
+        <a href="/public-view-documents/{{upload.id}}">
+          <div class="card p-6 bg-white rounded-lg glow">
+            <h4 class="text-xl font-semibold mb-2">{{upload.title}}</h4>
+            <p class="text-gray-600">{{upload.description}}</p>
+          </div>
+        </a>
+        {% endfor %}
       </div>
     </section>
+    {% endif %}
 
     <!-- Recent Uploads -->
     <section class="py-16 px-4 md:px-16 bg-white">

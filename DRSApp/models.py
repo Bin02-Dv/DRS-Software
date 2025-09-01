@@ -29,3 +29,4 @@ class Upload(models.Model):
     upload_date =  models.DateField(auto_now_add=True)
     file_type = models.CharField(max_length=20, blank=True, default="audio")
     status = models.CharField(max_length=30, default="pending")
+    topic = models.CharField(max_length=50, blank=True, null=True, default='test')

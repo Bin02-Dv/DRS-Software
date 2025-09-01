@@ -25,6 +25,10 @@
         <label for="title" class="block text-gray-600 mb-2">Document Title</label>
         <input type="text" name="title" id="title" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
       </div>
+      <div class="mb-4">
+        <label for="topic" class="block text-gray-600 mb-2">Document Topic</label>
+        <input type="text" name="topic" id="topic" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+      </div>
 
       <div class="mb-4">
         <label for="description" class="block text-gray-600 mb-2">Document Description</label>
@@ -53,6 +57,8 @@
         </tr>
       </thead>
       <tbody>
+        {% if current_user.role == 'admin' %}
+        
         {% if uploads %}
         {% for document in uploads %}
         <tr>
@@ -72,6 +78,30 @@
         <tr>
           <td colspan="7" class="text-center">No Documents yet!</td>
         </tr>
+        {% endif %}
+
+        {% else %}
+
+        {% if current_user_uploads %}
+        {% for document in current_user_uploads %}
+        <tr>
+          <td>DOC-{{ document.id }}</td>
+          <td>{{ document.title }}</td>
+          <td>{{ document.user.full_name }}</td>
+          <td>{{ document.upload_date|date:"Y-m-d" }}</td>
+          <td>{{ document.status|capfirst }}</td>
+          <td>
+            <a href="/view-documents/{{document.id}}" class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">View</a>
+            <button onclick="showPopup('success', 'Success!', 'Document {{ document.title }} updated successfully.', '/', 'OK')" class="p-2 bg-green-600 text-white rounded hover:bg-green-700">Edit</button>
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center">No Documents yet!</td>
+        </tr>
+        {% endif %}
+
         {% endif %}
       </tbody>
     </table>
