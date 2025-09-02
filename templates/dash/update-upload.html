@@ -1,0 +1,132 @@
+{% extends "dash/dash-base.html" %}
+
+{% load static %}
+{% block title %}Fatwa Repository - Edit Document{% endblock %}
+
+{% block content %}
+<style>
+  .glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+  .modal {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5); z-index: 1000;
+    justify-content: center; align-items: center;
+  }
+  .modal-content {
+    background: white; padding: 2rem; border-radius: 1rem;
+    max-width: 24rem; width: 90%; text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  .modal-success { border: 2px solid #10b981; }
+  .modal-error { border: 2px solid #ef4444; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-close {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    cursor: pointer; font-size: 1.5rem; color: #4b5563;
+  }
+  .modal-close:hover { color: #2563eb; }
+  .btn-success { background-color: #10b981; }
+  .btn-success:hover { background-color: #059669; }
+  .btn-error { background-color: #ef4444; }
+  .btn-error:hover { background-color: #dc2626; }
+  .detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; }
+  .detail-label { font-weight: bold; color: #4b5563; }
+  .detail-value { color: #1f2937; }
+</style>
+
+<!-- Edit Document Section -->
+<section class="py-16 px-4 md:px-16 max-w-lg mx-auto text-center">
+  <h2 class="text-3xl font-bold mb-8">Edit Document</h2>
+  <div class="bg-white p-6 rounded-lg glow">
+    <h3 class="text-xl font-semibold mb-4">Modify Document Details</h3>
+    <div class="space-y-2 text-left mb-6">
+      <div class="detail-row">
+        <span class="detail-label">Document ID:</span>
+        <span class="detail-value">DOC-{{ document.id }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Uploaded By:</span>
+        <span class="detail-value">{{ document.user.full_name }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Upload Date:</span>
+        <span class="detail-value">{{ document.upload_date|date:"Y-m-d" }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Status:</span>
+        <span class="detail-value">{{ document.status|capfirst }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Current File:</span>
+        <span class="detail-value">
+          <a href="{{ document.file.url }}" class="text-blue-600 hover:underline" target="_blank">{{ document.file.name|cut:"documents/" }}</a>
+        </span>
+      </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data" id="editForm">
+      {% csrf_token %}
+      <div class="mb-4 text-left">
+        <label for="title" class="block text-gray-600 mb-2">Document Title</label>
+        <input type="text" name="title" id="title" value="{{ document.title }}" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+      </div>
+      <div class="mb-4 text-left">
+        <label for="description" class="block text-gray-600 mb-2">Document Description</label>
+        <textarea name="description" id="description" rows="4" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">{{ document.description|default:"" }}</textarea>
+      </div>
+      <div class="mb-4 text-left">
+        <label for="file" class="block text-gray-600 mb-2">Replace File (PDF, MP3, or WAV, max 10MB)</label>
+        <input type="file" name="file" id="file" accept=".pdf,.mp3,.wav" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+      </div>
+      <button type="submit" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow w-full">Save Changes</button>
+    </form>
+    <p class="mt-4 text-sm text-gray-600">
+      <a href="/manage-documents/" class="hover:text-blue-600">Back to Manage Documents</a>
+    </p>
+  </div>
+</section>
+
+<!-- Popup Modal -->
+<div id="popupModal" class="modal flex">
+  <div id="modalContent" class="modal-content glow">
+    <span class="modal-close" onclick="hidePopup()">&times;</span>
+    <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
+    <p id="popupMessage" class="text-gray-600 mb-6">Your action was successful.</p>
+    <a id="popupAction" href="/manage-documents/" class="p-3 text-white rounded-lg glow">OK</a>
+  </div>
+</div>
+
+<script>
+  // Popup Functions
+  function showPopup(type, title, message, actionUrl, actionText) {
+    const modalContent = document.getElementById('modalContent');
+    const actionButton = document.getElementById('popupAction');
+    document.getElementById('popupTitle').textContent = title;
+    document.getElementById('popupMessage').textContent = message;
+    actionButton.href = actionUrl;
+    actionButton.textContent = actionText;
+    modalContent.classList.remove('modal-success', 'modal-error');
+    actionButton.classList.remove('btn-success', 'btn-error');
+    if (type === 'success') {
+      modalContent.classList.add('modal-success');
+      actionButton.classList.add('btn-success');
+    } else if (type === 'error') {
+      modalContent.classList.add('modal-error');
+      actionButton.classList.add('btn-error');
+    }
+    document.getElementById('popupModal').style.display = 'flex';
+  }
+
+  function hidePopup() {
+    document.getElementById('popupModal').style.display = 'none';
+  }
+
+  document.getElementById('popupModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('popupModal')) {
+      hidePopup();
+    }
+  });
+</script>
+{% endblock %}

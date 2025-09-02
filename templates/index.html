@@ -13,21 +13,23 @@
         A comprehensive digital archive of Islamic rulings and guidance, curated under the expertise of Prof. Abdullahi.
       </p>
       <div class="relative w-full max-w-md">
-        <input type="text" placeholder="Search fatwas..." class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
-        <button class="absolute right-2 top-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Search</button>
+        <input type="text" id="keyword" name="keyword" placeholder="Search fatwas..." class="w-full p-4 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+        <button id="searchBtn" class="absolute right-2 top-2 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Search</button>
       </div>
+      {% comment %} <div id="results" class="space-y-4"></div> {% endcomment %}
     </section>
 
     <!-- Featured Fatwas -->
     {% if uploads %}
     <section class="py-16 px-4 md:px-16 bg-gray-100">
       <h3 class="text-3xl font-bold mb-8 text-center">Featured Fatwas</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="results">
         {% for upload in uploads %}
         <a href="/public-view-documents/{{upload.id}}">
           <div class="card p-6 bg-white rounded-lg glow">
             <h4 class="text-xl font-semibold mb-2">{{upload.title}}</h4>
             <p class="text-gray-600">{{upload.description}}</p>
+            <p class="text-sm text-gray-500">Uploaded: {{upload.upload_date}}</p>
           </div>
         </a>
         {% endfor %}
@@ -39,16 +41,51 @@
     <section class="py-16 px-4 md:px-16 bg-white">
       <h3 class="text-3xl font-bold mb-8 text-center">Recent Uploads</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for upload in recent_fatwas %}
         <div class="card p-6 bg-white rounded-lg glow">
-          <h4 class="text-xl font-semibold mb-2">Fatwa on Marriage</h4>
-          <p class="text-gray-600">Recent rulings on marital obligations and rights.</p>
-          <p class="text-sm text-gray-500">Uploaded: Aug 5, 2025</p>
+          <h4 class="text-xl font-semibold mb-2">{{upload.title}}</h4>
+          <p class="text-gray-600">{{upload.description}}</p>
+          <p class="text-sm text-gray-500">Uploaded: {{upload.upload_date}}</p>
         </div>
-        <div class="card p-6 bg-white rounded-lg glow">
+        {% endfor %}
+        {% comment %} <div class="card p-6 bg-white rounded-lg glow">
           <h4 class="text-xl font-semibold mb-2">Fatwa on Business Ethics</h4>
           <p class="text-gray-600">Guidelines for ethical business practices in Islam.</p>
           <p class="text-sm text-gray-500">Uploaded: Aug 3, 2025</p>
-        </div>
+        </div> {% endcomment %}
       </div>
     </section>
+
+    <script>
+        document.getElementById("searchBtn").addEventListener("click", function(e) {
+            e.preventDefault();
+
+            let keyword = document.getElementById("keyword").value;
+
+            fetch(`/home-search-documents/?keyword=${keyword}`)
+                .then(response => response.json())
+                .then(data => {
+                    let resultsDiv = document.getElementById("results");
+                    resultsDiv.innerHTML = ""; // Clear old results
+
+                    if (data.results.length === 0) {
+                        resultsDiv.innerHTML = "<p class='text-gray-600'>No documents found.</p>";
+                    } else {
+                        data.results.forEach(doc => {
+                            resultsDiv.innerHTML += `
+                                <div class="p-6 bg-white rounded-lg glow result-child">
+                                  <h3 class="text-xl font-semibold">${doc.title}</h3>
+                                  <p class="text-gray-600">${doc.description}</p>
+                                  <p class="text-sm text-gray-500">
+                                    Category: ${doc.topic || "N/A"} | Date: ${doc.upload_date}
+                                  </p>
+                                  <a href="/public-view-documents/${doc.id}" target="_blank" 
+                                    class="text-blue-600 hover:underline">View / Download</a>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+        });
+    </script>
 {% endblock %}

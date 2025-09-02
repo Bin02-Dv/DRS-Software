@@ -1,0 +1,140 @@
+{% extends "dash/dash-base.html" %}
+
+{% load static %}
+{% block title %}Fatwa Repository - Profile Settings{% endblock %}
+
+{% block content %}
+<style>
+  .glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+  .modal {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5); z-index: 1000;
+    justify-content: center; align-items: center;
+  }
+  .modal-content {
+    background: white; padding: 2rem; border-radius: 1rem;
+    max-width: 24rem; width: 90%; text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  .modal-success { border: 2px solid #10b981; }
+  .modal-error { border: 2px solid #ef4444; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-close {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    cursor: pointer; font-size: 1.5rem; color: #4b5563;
+  }
+  .modal-close:hover { color: #2563eb; }
+  .btn-success { background-color: #10b981; }
+  .btn-success:hover { background-color: #059669; }
+  .btn-error { background-color: #ef4444; }
+  .btn-error:hover { background-color: #dc2626; }
+</style>
+
+<!-- Profile Settings Section -->
+<section class="py-16 px-4 md:px-16 max-w-lg mx-auto text-center">
+  <h2 class="text-3xl font-bold mb-8">Profile Settings</h2>
+  <div class="bg-white p-6 rounded-lg glow">
+    <h3 class="text-xl font-semibold mb-4">Update Your Profile</h3>
+    <form method="POST" id="profile_settings">
+      {% csrf_token %}
+      <div class="mb-4 text-left">
+        <label for="full_name" class="block text-gray-600 mb-2">Full Name</label>
+        <input type="text" name="full_name" id="full_name" value="{{ current_user.full_name }}" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+      </div>
+      <div class="mb-4 text-left">
+        <label for="email" class="block text-gray-600 mb-2">Email</label>
+        <input type="email" name="email" id="email" value="{{ current_user.email }}" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" disabled>
+      </div>
+      <div class="mb-4 text-left">
+        <label class="block text-gray-600 mb-2">Role</label>
+        <p class="text-gray-800 font-medium">{{ current_user.role|capfirst }}</p>
+        <input type="hidden" name="role" value="{{ current_user.role }}">
+      </div>
+      <div class="mb-4 text-left">
+        <label for="current_password" class="block text-gray-600 mb-2">Current Password</label>
+        <input type="password" name="current_password" id="current_password" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" placeholder="Enter current password">
+      </div>
+      <div class="mb-4 text-left">
+        <label for="new_password" class="block text-gray-600 mb-2">New Password</label>
+        <input type="password" name="new_password" id="new_password" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" placeholder="Enter new password">
+      </div>
+      <div class="mb-4 text-left">
+        <label for="confirm_password" class="block text-gray-600 mb-2">Confirm New Password</label>
+        <input type="password" name="confirm_password" id="confirm_password" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" placeholder="Confirm new password">
+      </div>
+      <button type="submit" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow w-full">Save Changes</button>
+    </form>
+    <p class="mt-4 text-sm text-gray-600">
+      <a href="/dash/" class="hover:text-blue-600">Back to Dashboard</a>
+    </p>
+  </div>
+</section>
+
+<!-- Popup Modal -->
+<div id="popupModal" class="modal flex">
+  <div id="modalContent" class="modal-content glow">
+    <span class="modal-close" onclick="hidePopup()">&times;</span>
+    <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
+    <p id="popupMessage" class="text-gray-600 mb-6">Your action was successful.</p>
+    <a id="popupAction" href="/profile-settings/" class="p-3 text-white rounded-lg glow">OK</a>
+  </div>
+</div>
+
+<script>
+  // Popup Functions
+  function showPopup(type, title, message, actionUrl, actionText) {
+    const modalContent = document.getElementById('modalContent');
+    const actionButton = document.getElementById('popupAction');
+    document.getElementById('popupTitle').textContent = title;
+    document.getElementById('popupMessage').textContent = message;
+    actionButton.href = actionUrl;
+    actionButton.textContent = actionText;
+    modalContent.classList.remove('modal-success', 'modal-error');
+    actionButton.classList.remove('btn-success', 'btn-error');
+    if (type === 'success') {
+      modalContent.classList.add('modal-success');
+      actionButton.classList.add('btn-success');
+    } else if (type === 'error') {
+      modalContent.classList.add('modal-error');
+      actionButton.classList.add('btn-error');
+    }
+    document.getElementById('popupModal').style.display = 'flex';
+  }
+
+  function hidePopup() {
+    document.getElementById('popupModal').style.display = 'none';
+  }
+
+  document.getElementById('popupModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('popupModal')) {
+      hidePopup();
+    }
+  });
+</script>
+
+<script>
+    $(document).on('submit', '#profile_settings', function (e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: 'POST',
+            url: '/profile-settings/', 
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response){
+                var success = response['success'];
+                if(success){
+                    showPopup('success', 'Success!', response['message'], '/login/', 'Now you can Login.')
+                }else{
+                    showPopup('error', 'Error!', response['message'], '#', 'Again!')
+                }
+            }
+        });
+    });
+  </script>
+{% endblock %}

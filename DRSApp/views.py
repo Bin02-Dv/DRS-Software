@@ -14,8 +14,10 @@ def popup(request):
 
 def index(request):
     all_uploads = models.Upload.objects.filter(status='approved').order_by("-id")
+    recent_fatwas = models.Upload.objects.all().order_by('-upload_date')[:2]
     context = {
-        'uploads': all_uploads
+        'uploads': all_uploads,
+        'recent_fatwas': recent_fatwas
     }
     return render(request, "index.html", context)
 
@@ -84,6 +86,42 @@ def signup(request):
 def about(request):
     return render(request, 'about.html')
 
+@login_required(login_url='/login/')
+def profile_settings(request):
+    current_user = request.user
+    if request.method == 'POST':
+        full_name = request.POST.get("full_name", "")
+        password = request.POST.get("new_password", "")
+        confirm_password = request.POST.get("confirm_password", "")
+        
+        get_current_user = models.AuthModel.objects.filter(id=current_user.id).first()
+        
+        if get_current_user:
+        
+            if confirm_password != password:
+                return JsonResponse({
+                    "message": "Sorry your password and confirm password missed match!!",
+                    "success": False
+                })
+            
+            else:
+                get_current_user.full_name = full_name
+                get_current_user.set_password(password)
+                get_current_user.save()
+                return JsonResponse({
+                    "message": "Profile Updated successfully...",
+                    "success": True
+                })
+        else:
+            return JsonResponse({
+                "message": "Sorry we couldn't find your account!!",
+                "success": False
+            })
+    context = {
+        "current_user": current_user
+    }
+    return render(request, 'dash/profile-settings.html', context)
+
 def search(request):
     all_uploads = models.Upload.objects.filter(status='approved').order_by("-id")
     context = {
@@ -95,6 +133,8 @@ def search(request):
 def dash(request):
     current_user = request.user
     total_docs_uploaded = models.Upload.objects.all().count()
+    recent_fatwas = models.Upload.objects.all().order_by('-upload_date')[:2]
+    
     formatted_total_uploaded_docs = f"{total_docs_uploaded:,}"
     
     total_users = models.AuthModel.objects.all().count()
@@ -106,7 +146,8 @@ def dash(request):
         "total_docs_uploaded": formatted_total_uploaded_docs,
         "total_users": formatted_total_users,
         "total_pending_approvals": formatted_total_pending_approvals,
-        "current_user": current_user
+        "current_user": current_user,
+        "recent_fatwas": recent_fatwas
     }
     return render(request, 'dash/dashboard.html', context)
 
@@ -240,3 +281,35 @@ def search_documents(request):
         })
 
     return JsonResponse({"results": data})
+
+def home_search_documents(request):
+    keyword = request.GET.get("keyword", "")
+
+    # Start filtering
+    results = models.Upload.objects.filter(status="approved")  # show only approved docs
+
+    if keyword:
+        results = results.filter(
+            Q(title__icontains=keyword) | Q(description__icontains=keyword)
+        )
+
+    # Build JSON response
+    data = []
+    for doc in results:
+        data.append({
+            "id": doc.id,
+            "title": doc.title,
+            "description": doc.description,
+            "file_url": doc.file.url,
+            "upload_date": doc.upload_date.strftime("%Y-%m-%d"),
+            "topic": doc.topic,
+        })
+
+    return JsonResponse({"results": data})
+
+def update_upload(request, id):
+    document = models.Upload.objects.filter(id=id).first()
+    context = {
+        "document": document
+    }
+    return render(request, "dash/update-upload.html", context)

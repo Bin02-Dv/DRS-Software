@@ -48,7 +48,7 @@
         </div>
         <div class="flex justify-center space-x-4 mb-8 user-links">
           <a href="/manage-users/" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Manage Users</a>
-          <a href="/manage_categories.html" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Manage Categories</a>
+          {% comment %} <a href="/manage_categories.html" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Manage Categories</a> {% endcomment %}
           <a href="/view_logs.html" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">View Logs</a>
         </div>
       </div>
@@ -79,21 +79,18 @@
 
         <h4 class="text-2xl font-bold mb-4">Recent Uploads</h4>
         <div class="space-y-4 mb-8">
+          {% for upload in recent_fatwas %}
           <div class="card p-6 bg-white rounded-lg glow">
-            <h5 class="text-xl font-semibold">Fatwa on Marriage</h5>
-            <p class="text-gray-600">Recent rulings on marital obligations and rights.</p>
-            <p class="text-sm text-gray-500">Uploaded: Aug 5, 2025</p>
+            <h4 class="text-xl font-semibold mb-2">{{upload.title}}</h4>
+            <p class="text-gray-600">{{upload.description}}</p>
+            <p class="text-sm text-gray-500">Uploaded: {{upload.upload_date}}</p>
           </div>
-          <div class="card p-6 bg-white rounded-lg glow">
-            <h5 class="text-xl font-semibold">Fatwa on Business Ethics</h5>
-            <p class="text-gray-600">Guidelines for ethical business practices in Islam.</p>
-            <p class="text-sm text-gray-500">Uploaded: Aug 3, 2025</p>
-          </div>
+          {% endfor %}
         </div>
         
         <div class="flex justify-center space-x-4">
           <a href="/manage-documents/" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Manage Documents</a>
-          <a href="/profile_settings.html" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Profile Settings</a>
+          <a href="/profile-settings/" class="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow">Profile Settings</a>
         </div>
       </div>
     </section>
