@@ -30,3 +30,9 @@ class Upload(models.Model):
     file_type = models.CharField(max_length=20, blank=True, default="audio")
     status = models.CharField(max_length=30, default="pending")
     topic = models.CharField(max_length=50, blank=True, null=True, default='test')
+
+class Contact(models.Model):
+    full_name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(max_length=200, blank=True)
+    subject = models.CharField(max_length=200, blank=True)
+    message = models.TextField(max_length=250, blank=True)

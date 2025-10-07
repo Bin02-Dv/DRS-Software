@@ -313,3 +313,21 @@ def update_upload(request, id):
         "document": document
     }
     return render(request, "dash/update-upload.html", context)
+
+def contact(request):
+    
+    if request.method == 'POST':
+        full_name = request.POST.get("full_name")
+        email = request.POST.get("email")
+        subject = request.POST.get("subject")
+        message = request.POST.get("message")
+        
+        models.Contact.objects.create(
+            full_name=full_name, email=email, subject=subject, message=message
+        )
+        
+        return JsonResponse({
+            "message": "Your message has been sent successfully...",
+            "success": True
+        })
+    return render(request, "contact.html")

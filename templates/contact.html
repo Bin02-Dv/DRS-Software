@@ -1,7 +1,7 @@
-{% extends "dash/dash-base.html" %}
+{% extends "base.html" %}
 
 {% load static %}
-{% block title %}Edit Document{% endblock %}
+{% block title %}Contact Us{% endblock %}
 
 {% block content %}
 <style>
@@ -32,59 +32,36 @@
   .btn-success:hover { background-color: #059669; }
   .btn-error { background-color: #ef4444; }
   .btn-error:hover { background-color: #dc2626; }
-  .detail-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; }
-  .detail-label { font-weight: bold; color: #4b5563; }
-  .detail-value { color: #1f2937; }
 </style>
 
-<!-- Edit Document Section -->
+<!-- Contact Section -->
 <section class="py-16 px-4 md:px-16 max-w-lg mx-auto text-center">
-  <h2 class="text-3xl font-bold mb-8">Edit Document</h2>
+  <h2 class="text-3xl font-bold mb-8">Contact Us</h2>
   <div class="bg-white p-6 rounded-lg glow">
-    <h3 class="text-xl font-semibold mb-4">Modify Document Details</h3>
-    <div class="space-y-2 text-left mb-6">
-      <div class="detail-row">
-        <span class="detail-label">Document ID:</span>
-        <span class="detail-value">DOC-{{ document.id }}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Uploaded By:</span>
-        <span class="detail-value">{{ document.user.full_name }}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Upload Date:</span>
-        <span class="detail-value">{{ document.upload_date|date:"Y-m-d" }}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Status:</span>
-        <span class="detail-value">{{ document.status|capfirst }}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Current File:</span>
-        <span class="detail-value">
-          <a href="{{ document.file.url }}" class="text-blue-600 hover:underline" target="_blank">{{ document.file.name|cut:"documents/" }}</a>
-        </span>
-      </div>
-    </div>
-    <form method="POST" enctype="multipart/form-data" id="editForm">
+    <p class="text-gray-600 mb-6">Have questions or feedback? Reach out to the Hikma Archive team!</p>
+    <form method="POST" id="contactForm">
       {% csrf_token %}
       <div class="mb-4 text-left">
-        <label for="title" class="block text-gray-600 mb-2">Document Title</label>
-        <input type="text" name="title" id="title" value="{{ document.title }}" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
+        <label for="name" class="block text-gray-600 mb-2">Name</label>
+        <input type="text" name="full_name" id="name" value="{% if user.is_authenticated %}{{ user.full_name }}{% endif %}" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
       </div>
       <div class="mb-4 text-left">
-        <label for="description" class="block text-gray-600 mb-2">Document Description</label>
-        <textarea name="description" id="description" rows="4" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">{{ document.description|default:"" }}</textarea>
+        <label for="email" class="block text-gray-600 mb-2">Email</label>
+        <input type="email" name="email" id="email" value="{% if user.is_authenticated %}{{ user.email }}{% endif %}" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
       </div>
       <div class="mb-4 text-left">
-        <label for="file" class="block text-gray-600 mb-2">Replace File (PDF, MP3, or WAV, max 10MB)</label>
-        <input type="file" name="file" id="file" accept=".pdf,.mp3,.wav" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow">
+        <label for="subject" class="block text-gray-600 mb-2">Subject</label>
+        <input type="text" name="subject" id="subject" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required>
       </div>
-      <button type="submit" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow w-full">Save Changes</button>
+      <div class="mb-4 text-left">
+        <label for="message" class="block text-gray-600 mb-2">Message</label>
+        <textarea name="message" id="message" rows="5" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 glow" required></textarea>
+      </div>
+      <button type="submit" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 glow w-full">Send Message</button>
     </form>
-    <p class="mt-4 text-sm text-gray-600">
-      <a href="/manage-documents/" class="hover:text-blue-600">Back to Manage Documents</a>
-    </p>
+    {% comment %} <p class="mt-4 text-sm text-gray-600">
+      <a href="{% url 'dashboard' %}" class="hover:text-blue-600">Back to Dashboard</a>
+    </p> {% endcomment %}
   </div>
 </section>
 
@@ -94,10 +71,10 @@
     <span class="modal-close" onclick="hidePopup()">&times;</span>
     <h3 id="popupTitle" class="text-2xl font-bold mb-4">Success!</h3>
     <p id="popupMessage" class="text-gray-600 mb-6">Your action was successful.</p>
-    <a id="popupAction" href="/manage-documents/" class="p-3 text-white rounded-lg glow">OK</a>
+    <a id="popupAction" href="{% url 'contact' %}" class="p-3 text-white rounded-lg glow">OK</a>
   </div>
 </div>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
   // Popup Functions
   function showPopup(type, title, message, actionUrl, actionText) {
@@ -129,4 +106,26 @@
     }
   });
 </script>
+
+<script>
+    $(document).on('submit', '#contactForm', function (e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: 'POST',
+            url: '/contact/', 
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response){
+                var success = response['success'];
+                if(success){
+                    showPopup('success', 'Success!', response['message'], '/contact/', 'Done.')
+                }else{
+                    showPopup('error', 'Error!', response['message'], '#', 'Again!')
+                }
+            }
+        });
+    });
+  </script>
 {% endblock %}
